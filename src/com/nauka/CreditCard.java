@@ -45,20 +45,26 @@ public class CreditCard {
 
     private int setCheckDigit() {
         String accountNumberWoCheckDigit = bin + accountIdentifier;
-        char[] numbers = accountNumberWoCheckDigit.toCharArray();
+        char[] numbersChar = accountNumberWoCheckDigit.toCharArray();
+        int[] numbers = new int[numbersChar.length];
+
+        for (int i = 0; i < numbersChar.length; i++) {
+            numbers[i] = Integer.parseInt(String.valueOf(numbersChar[i]));
+        }
+
         int sum = 0;
-        int checkDigit = 0;
 
-        for (char number : numbers) {
-            sum += Integer.parseInt(String.valueOf(number));
+        for (int i = 0; i < numbers.length; i++) {
+            if (i % 2 == 0) {
+                numbers[i] = 2 * numbers[i];
+            }
+            if (numbers[i] > 9) {
+                numbers[i] = numbers[i] - 9;
+            }
+            sum += numbers[i];
         }
 
-        while (sum % 10 != 0) {
-            sum += 1;
-            checkDigit += 1;
-        }
-
-        return checkDigit;
+        return 10 - (sum % 10);
 
     }
 
