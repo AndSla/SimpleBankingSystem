@@ -38,7 +38,7 @@ public class UserInterface {
         }
     }
 
-    void showInfo(String accountNumber, int pin) {
+    void showInfo(String accountNumber, String pin) {
         System.out.println("\nYour card has been created");
         System.out.println("Your card number:");
         System.out.println(accountNumber);
@@ -59,7 +59,7 @@ public class UserInterface {
 
         CreditCard loginCard = new CreditCard();
         loginCard.setAccountNumber(accountNumber);
-        loginCard.setPin(Integer.parseInt(pin));
+        loginCard.setPin(pin);
 
         return loginCard;
     }
