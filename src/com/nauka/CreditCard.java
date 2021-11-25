@@ -64,7 +64,11 @@ public class CreditCard {
             sum += numbers[i];
         }
 
-        return 10 - (sum % 10);
+        if (sum % 10 == 0) {
+            return 0;
+        } else {
+            return 10 - (sum % 10);
+        }
 
     }
 
