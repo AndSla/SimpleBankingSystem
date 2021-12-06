@@ -4,6 +4,7 @@ public class Main {
     public static void main(String[] args) {
         Bank bank = new Bank();
         UserInterface ui = new UserInterface();
+        Database db = new Database("card.db");
         Client loggedClient = null;
 
         while (ui.isRunning()) {
