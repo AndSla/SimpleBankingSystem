@@ -1,4 +1,4 @@
-package com.nauka;
+package com.nauka.SimpleBankingSystem;
 
 public class Client {
 

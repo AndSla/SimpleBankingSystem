@@ -1,4 +1,4 @@
-package com.nauka;
+package com.nauka.SimpleBankingSystem;
 
 import java.util.HashSet;
 import java.util.Set;
