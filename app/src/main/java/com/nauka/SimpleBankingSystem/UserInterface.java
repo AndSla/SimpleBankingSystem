@@ -69,6 +69,16 @@ public class UserInterface {
         System.out.println("\nBye!");
     }
 
+    String getDbNameFromCmdLineParameter(String param1, String param2) {
+        if (param1.equals("-fileName")) {
+            return param2;
+        } else {
+            System.out.println("Wrong parameters! Try again.");
+            setRunning(false);
+        }
+        return null;
+    }
+
     public int getMenuItem() {
         return menuItem;
     }

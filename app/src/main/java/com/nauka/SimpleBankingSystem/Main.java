@@ -4,8 +4,10 @@ public class Main {
     public static void main(String[] args) {
         Bank bank = new Bank();
         UserInterface ui = new UserInterface();
-        Database db = new Database("card.db");
         Client loggedClient = null;
+
+        String dbName = ui.getDbNameFromCmdLineParameter(args[0], args[1]);
+        Database db = new Database(dbName);
 
         while (ui.isRunning()) {
             ui.showMainMenu();
@@ -15,6 +17,7 @@ public class Main {
                 case 1:
                     Client newClient = bank.createClient();
                     ui.showInfo(newClient.getCard().getAccountNumber(), newClient.getCard().getPin());
+                    db.insert(newClient.getCard());
                     break;
                 case 2:
                     loggedClient = bank.logIn(ui.loginData());
