@@ -2,12 +2,15 @@ package com.nauka.SimpleBankingSystem;
 
 public class Main {
     public static void main(String[] args) {
-        Bank bank = new Bank();
         UserInterface ui = new UserInterface();
-        Client loggedClient = null;
+        Bank bank = new Bank();
+        CreditCard loggedCard = null;
 
         String dbName = ui.getDbNameFromCmdLineParameter(args[0], args[1]);
-        Database db = new Database(dbName);
+        if (dbName != null) {
+            Database db = new Database(dbName);
+            bank.setCards(db);
+        }
 
         while (ui.isRunning()) {
             ui.showMainMenu();
@@ -15,32 +18,31 @@ public class Main {
 
             switch (ui.getMenuItem()) {
                 case 1:
-                    Client newClient = bank.createClient();
-                    ui.showInfo(newClient.getCard().getAccountNumber(), newClient.getCard().getPin());
-                    db.insert(newClient.getCard());
+                    CreditCard newCard = bank.createCard();
+                    ui.showInfo(newCard.getAccountNumber(), newCard.getPin());
                     break;
                 case 2:
-                    loggedClient = bank.logIn(ui.loginData());
+                    loggedCard = bank.logIn(ui.loginData());
                     break;
                 case 0:
                     ui.exit();
             }
 
-            if (loggedClient != null) {
-                while (loggedClient.isLogged()) {
+            if (loggedCard != null) {
+                while (loggedCard.isLogged()) {
                     ui.showClientMenu();
                     ui.getMenuItemFromInput(2);
 
                     switch (ui.getMenuItem()) {
                         case 1:
-                            ui.showBalance(loggedClient.getCard().getBalance());
+                            ui.showBalance(loggedCard.getBalance());
                             break;
                         case 2:
-                            loggedClient.setLogged(false);
+                            loggedCard.setLogged(false);
                             ui.showLogoutMessage();
                             break;
                         case 0:
-                            loggedClient.setLogged(false);
+                            loggedCard.setLogged(false);
                             ui.exit();
                     }
 

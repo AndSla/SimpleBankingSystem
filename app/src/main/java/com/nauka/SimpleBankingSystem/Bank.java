@@ -1,26 +1,28 @@
 package com.nauka.SimpleBankingSystem;
 
-import java.util.HashSet;
-import java.util.Set;
-
 public class Bank {
 
-    private final Set<Client> clients = new HashSet<>();
+    private Database cards;
 
-    public Client createClient() {
-        Client client = new Client();
-        clients.add(client);
-        return client;
+    public Bank() {
     }
 
-    public Client logIn(CreditCard loginCard) {
-        for (Client client : clients) {
-            if (client.getCard().equals(loginCard)) {
-                client.setLogged(true);
+    public void setCards(Database cards) {
+        this.cards = cards;
+    }
+
+    public CreditCard createCard() {
+        CreditCard card = new CreditCard();
+        cards.insert(card);
+        return card;
+    }
+
+    public CreditCard logIn(CreditCard loginCard) {
+            if (cards.find(loginCard)) {
+                loginCard.setLogged(true);
                 System.out.println("You have successfully logged in!\n");
-                return client;
+                return loginCard;
             }
-        }
 
         System.out.println("Wrong card number or PIN!\n");
         return null;

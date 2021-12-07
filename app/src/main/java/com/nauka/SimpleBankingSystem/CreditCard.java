@@ -10,6 +10,7 @@ public class CreditCard {
     private String pin;
     private String accountNumber;
     private int balance;
+    private boolean logged = false;
 
     public CreditCard() {
         Random ran = new Random();
@@ -70,6 +71,14 @@ public class CreditCard {
             return 10 - (sum % 10);
         }
 
+    }
+
+    public void setLogged(boolean logged) {
+        this.logged = logged;
+    }
+
+    public boolean isLogged() {
+        return logged;
     }
 
     @Override

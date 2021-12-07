@@ -3,6 +3,7 @@ package com.nauka.SimpleBankingSystem;
 import org.sqlite.SQLiteDataSource;
 
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
@@ -39,6 +40,38 @@ public class Database {
             e.printStackTrace();
         }
 
+    }
+
+    boolean find(CreditCard card) {
+
+        try (Connection con = dataSource.getConnection()) {
+            if (con.isValid(5)) {
+
+                try (Statement statement = con.createStatement()) {
+
+                    try (ResultSet storedCard = statement.executeQuery("SELECT number, pin " +
+                            "FROM card " +
+                            "WHERE " +
+                            "number = '" + card.getAccountNumber() + "'" +
+                            " AND " +
+                            "pin = '" + card.getPin() + "';")) {
+
+                        while (storedCard.next()) {
+                            return true;
+                        }
+
+                    }
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return false;
     }
 
 }
