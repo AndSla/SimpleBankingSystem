@@ -4,29 +4,34 @@ public class Bank {
 
     private Database cards;
 
-    public Bank() {
-    }
-
-    public void setCards(Database cards) {
+    void setCards(Database cards) {
         this.cards = cards;
     }
 
-    public CreditCard createCard() {
+    CreditCard createCard() {
         CreditCard card = new CreditCard();
         cards.insert(card);
         return card;
     }
 
-    public CreditCard logIn(CreditCard loginCard) {
-            if (cards.find(loginCard)) {
-                loginCard.setLogged(true);
-                System.out.println("You have successfully logged in!\n");
-                return loginCard;
-            }
+    CreditCard logIn(CreditCard loginCard) {
+        if (cards.find(loginCard)) {
+            loginCard.setLogged(true);
+            System.out.println("You have successfully logged in!\n");
+            return loginCard;
+        }
 
         System.out.println("Wrong card number or PIN!\n");
         return null;
 
+    }
+
+    int getBalance(CreditCard card) {
+        return cards.getBalance(card);
+    }
+
+    void addIncome(CreditCard card, int amount) {
+        cards.addIncome(card, amount);
     }
 
 }

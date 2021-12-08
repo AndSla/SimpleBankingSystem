@@ -30,14 +30,24 @@ public class Main {
 
             if (loggedCard != null) {
                 while (loggedCard.isLogged()) {
-                    ui.showClientMenu();
-                    ui.getMenuItemFromInput(2);
+                    ui.showCardMenu();
+                    ui.getMenuItemFromInput(5);
 
                     switch (ui.getMenuItem()) {
                         case 1:
-                            ui.showBalance(loggedCard.getBalance());
+                            ui.showBalance(bank.getBalance(loggedCard));
                             break;
                         case 2:
+                            ui.showAddIncomePrompt();
+                            bank.addIncome(loggedCard, ui.getIncomeValue());
+                            break;
+                        case 3:
+                            System.out.println("Do transfer");
+                            break;
+                        case 4:
+                            System.out.println("Close account");
+                            break;
+                        case 5:
                             loggedCard.setLogged(false);
                             ui.showLogoutMessage();
                             break;

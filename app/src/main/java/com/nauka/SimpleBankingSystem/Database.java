@@ -56,7 +56,7 @@ public class Database {
                             " AND " +
                             "pin = '" + card.getPin() + "';")) {
 
-                        while (storedCard.next()) {
+                        if (storedCard.next()) {
                             return true;
                         }
 
@@ -72,6 +72,58 @@ public class Database {
         }
 
         return false;
+    }
+
+    int getBalance(CreditCard card) {
+
+        try (Connection con = dataSource.getConnection()) {
+            if (con.isValid(5)) {
+
+                try (Statement statement = con.createStatement()) {
+
+                    try (ResultSet storedCard = statement.executeQuery("SELECT balance " +
+                            "FROM card " +
+                            "WHERE " +
+                            "number = '" + card.getAccountNumber() + "'" +
+                            " AND " +
+                            "pin = '" + card.getPin() + "';")) {
+
+                        return storedCard.getInt("balance");
+
+                    }
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return 0;
+
+    }
+
+    void addIncome(CreditCard card, int amount) {
+        try (Connection con = dataSource.getConnection()) {
+            if (con.isValid(5)) {
+
+                try (Statement statement = con.createStatement()) {
+
+                    statement.executeUpdate("UPDATE card " +
+                            "SET balance = balance + " + amount + " " +
+                            "WHERE number = " + card.getAccountNumber() + ";");
+
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
 }
