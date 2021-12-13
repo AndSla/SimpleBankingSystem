@@ -4,6 +4,10 @@ public class Bank {
 
     private Database cards;
 
+    public Database getDb() {
+        return cards;
+    }
+
     void setCards(Database cards) {
         this.cards = cards;
     }
@@ -24,14 +28,6 @@ public class Bank {
         System.out.println("Wrong card number or PIN!\n");
         return null;
 
-    }
-
-    int getBalance(CreditCard card) {
-        return cards.getBalance(card);
-    }
-
-    void addIncome(CreditCard card, int amount) {
-        cards.addIncome(card, amount);
     }
 
 }

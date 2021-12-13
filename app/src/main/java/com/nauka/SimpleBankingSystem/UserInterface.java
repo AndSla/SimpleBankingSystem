@@ -30,6 +30,48 @@ public class UserInterface {
         System.out.print("> ");
     }
 
+    String getTransferAccountNumber() {
+        System.out.println("\nTransfer");
+        System.out.println("Enter card number:");
+        System.out.print("> ");
+
+        String accountNumber = sc.nextLine();
+
+        if (accountNumber.matches("\\d{16}")) {
+            int lastDigit = Integer.parseInt(accountNumber.substring(15, 16));
+            CreditCard tempCard = new CreditCard();
+            tempCard.setAccountNumber(accountNumber);
+            String accountNumberWithoutLastDigit = accountNumber.substring(0, 15);
+
+            if (lastDigit == tempCard.calculateCheckDigit(accountNumberWithoutLastDigit)) {
+                return accountNumber;
+            } else {
+                System.out.println("Probably you made a mistake in the card number. Please try again!\n");
+            }
+
+        }
+
+        return null;
+
+    }
+
+    int getTransferAmount() {
+
+        int transferAmount = 0;
+
+        System.out.println("Enter how much money you want to transfer:");
+        System.out.print("> ");
+
+        String transferAmountString = sc.nextLine();
+
+        if (transferAmountString.matches("\\d+")) {
+            transferAmount = Integer.parseInt(transferAmountString);
+        }
+
+        return transferAmount;
+
+    }
+
     void showLogoutMessage() {
         System.out.println("\nYou have successfully logged out!\n");
     }

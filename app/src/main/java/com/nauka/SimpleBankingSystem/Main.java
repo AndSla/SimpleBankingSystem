@@ -35,14 +35,17 @@ public class Main {
 
                     switch (ui.getMenuItem()) {
                         case 1:
-                            ui.showBalance(bank.getBalance(loggedCard));
+                            ui.showBalance(bank.getDb().getBalance(loggedCard));
                             break;
                         case 2:
                             ui.showAddIncomePrompt();
-                            bank.addIncome(loggedCard, ui.getIncomeValue());
+                            bank.getDb().addIncome(loggedCard, ui.getIncomeValue());
                             break;
                         case 3:
-                            System.out.println("Do transfer");
+                            String transferAccountNumber = ui.getTransferAccountNumber();
+                            if (transferAccountNumber != null && bank.getDb().accountExists(transferAccountNumber)) {
+                                bank.getDb().doTransfer(loggedCard, transferAccountNumber, ui.getTransferAmount());
+                            }
                             break;
                         case 4:
                             System.out.println("Close account");

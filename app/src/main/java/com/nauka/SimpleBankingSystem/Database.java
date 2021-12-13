@@ -115,6 +115,8 @@ public class Database {
                             "SET balance = balance + " + amount + " " +
                             "WHERE number = " + card.getAccountNumber() + ";");
 
+                    System.out.println("Income was added!\n");
+
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
@@ -124,6 +126,72 @@ public class Database {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    boolean accountExists(String accountNumber) {
+        try (Connection con = dataSource.getConnection()) {
+            if (con.isValid(5)) {
+
+                try (Statement statement = con.createStatement()) {
+
+                    try (ResultSet storedCard = statement.executeQuery("SELECT number " +
+                            "FROM card " +
+                            "WHERE " +
+                            "number = '" + accountNumber + "';")) {
+
+                        if (storedCard.next()) {
+                            return true;
+                        }
+
+                    }
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        System.out.println("Such a card does not exist.\n");
+        return false;
+    }
+
+    void doTransfer(CreditCard card, String transferAccountNumber, int transferAmount) {
+
+
+        if (getBalance(card) - transferAmount > 0) {
+
+            try (Connection con = dataSource.getConnection()) {
+                if (con.isValid(5)) {
+
+                    try (Statement statement = con.createStatement()) {
+
+                        statement.executeUpdate("UPDATE card " +
+                                "SET balance = balance - " + transferAmount + " " +
+                                "WHERE number = " + card.getAccountNumber() + ";");
+
+                        statement.executeUpdate("UPDATE card " +
+                                "SET balance = balance + " + transferAmount + " " +
+                                "WHERE number = " + transferAccountNumber + ";");
+
+                        System.out.println("Success!\n");
+
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+
+        } else {
+            System.out.println("Not enough money!\n");
+        }
+
     }
 
 }

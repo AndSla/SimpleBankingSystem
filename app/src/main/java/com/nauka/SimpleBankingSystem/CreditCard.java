@@ -45,8 +45,12 @@ public class CreditCard {
     }
 
     private int setCheckDigit() {
-        String accountNumberWoCheckDigit = bin + accountIdentifier;
-        char[] numbersChar = accountNumberWoCheckDigit.toCharArray();
+        String accountNumberWithoutLastDigit = bin + accountIdentifier;
+        return calculateCheckDigit(accountNumberWithoutLastDigit);
+    }
+
+    public int calculateCheckDigit(String accountNumberWithoutLastDigit) {
+        char[] numbersChar = accountNumberWithoutLastDigit.toCharArray();
         int[] numbers = new int[numbersChar.length];
 
         for (int i = 0; i < numbersChar.length; i++) {
@@ -70,7 +74,6 @@ public class CreditCard {
         } else {
             return 10 - (sum % 10);
         }
-
     }
 
     public void setLogged(boolean logged) {
