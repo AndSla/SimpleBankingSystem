@@ -194,4 +194,28 @@ public class Database {
 
     }
 
+    void closeAccount(CreditCard card) {
+
+        try (Connection con = dataSource.getConnection()) {
+            if (con.isValid(5)) {
+
+                try (Statement statement = con.createStatement()) {
+
+                    statement.executeUpdate("DELETE FROM card " +
+                            "WHERE number = " + card.getAccountNumber() + ";");
+
+                    System.out.println("\nThe account has been closed!\n");
+
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+    }
+
 }

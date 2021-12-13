@@ -48,7 +48,8 @@ public class Main {
                             }
                             break;
                         case 4:
-                            System.out.println("Close account");
+                            bank.getDb().closeAccount(loggedCard);
+                            loggedCard.setLogged(false);
                             break;
                         case 5:
                             loggedCard.setLogged(false);
