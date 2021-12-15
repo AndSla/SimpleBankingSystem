@@ -3,9 +3,9 @@ package com.nauka.SimpleBankingSystem;
 import org.sqlite.SQLiteDataSource;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 
 public class Database {
     private final SQLiteDataSource dataSource = new SQLiteDataSource();
@@ -13,6 +13,28 @@ public class Database {
     public Database(String name) {
         String url = "jdbc:sqlite:" + name;
         dataSource.setUrl(url);
+
+        try (Connection con = dataSource.getConnection()) {
+            if (con.isValid(5)) {
+
+                String create = "CREATE TABLE IF NOT EXISTS card (" +
+                        "id INTEGER PRIMARY KEY," +
+                        "number VARCHAR(16) NOT NULL," +
+                        "pin VARCHAR(4) NOT NULL," +
+                        "balance INTEGER DEFAULT 0);";
+
+                try (PreparedStatement preparedStatement = con.prepareStatement(create)) {
+                    preparedStatement.executeUpdate();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
     }
 
     void insert(CreditCard card) {
@@ -20,15 +42,13 @@ public class Database {
         try (Connection con = dataSource.getConnection()) {
             if (con.isValid(5)) {
 
-                try (Statement statement = con.createStatement()) {
-                    statement.executeUpdate("CREATE TABLE IF NOT EXISTS card (" +
-                            "id INTEGER PRIMARY KEY," +
-                            "number VARCHAR(16) NOT NULL," +
-                            "pin VARCHAR(4) NOT NULL," +
-                            "balance INTEGER DEFAULT 0);");
+                String insert = "INSERT INTO card (number, pin, balance) VALUES (?, ?, ?);";
 
-                    statement.executeUpdate("INSERT INTO card (number, pin, balance) VALUES " +
-                            "(" + card.getAccountNumber() + ", " + card.getPin() + ", " + card.getBalance() + ");");
+                try (PreparedStatement preparedStatement = con.prepareStatement(insert)) {
+                    preparedStatement.setString(1, card.getAccountNumber());
+                    preparedStatement.setString(2, card.getPin());
+                    preparedStatement.setInt(3, card.getBalance());
+                    preparedStatement.executeUpdate();
 
                 } catch (SQLException e) {
                     e.printStackTrace();
@@ -47,14 +67,13 @@ public class Database {
         try (Connection con = dataSource.getConnection()) {
             if (con.isValid(5)) {
 
-                try (Statement statement = con.createStatement()) {
+                String find = "SELECT number, pin FROM card WHERE number = ? AND pin = ?;";
 
-                    try (ResultSet storedCard = statement.executeQuery("SELECT number, pin " +
-                            "FROM card " +
-                            "WHERE " +
-                            "number = '" + card.getAccountNumber() + "'" +
-                            " AND " +
-                            "pin = '" + card.getPin() + "';")) {
+                try (PreparedStatement preparedStatement = con.prepareStatement(find)) {
+                    preparedStatement.setString(1, card.getAccountNumber());
+                    preparedStatement.setString(2, card.getPin());
+
+                    try (ResultSet storedCard = preparedStatement.executeQuery()) {
 
                         if (storedCard.next()) {
                             return true;
@@ -79,14 +98,13 @@ public class Database {
         try (Connection con = dataSource.getConnection()) {
             if (con.isValid(5)) {
 
-                try (Statement statement = con.createStatement()) {
+                String select = "SELECT balance FROM card WHERE number = ? AND pin = ?;";
 
-                    try (ResultSet storedCard = statement.executeQuery("SELECT balance " +
-                            "FROM card " +
-                            "WHERE " +
-                            "number = '" + card.getAccountNumber() + "'" +
-                            " AND " +
-                            "pin = '" + card.getPin() + "';")) {
+                try (PreparedStatement preparedStatement = con.prepareStatement(select)) {
+                    preparedStatement.setString(1, card.getAccountNumber());
+                    preparedStatement.setString(2, card.getPin());
+
+                    try (ResultSet storedCard = preparedStatement.executeQuery()) {
 
                         return storedCard.getInt("balance");
 
@@ -109,11 +127,12 @@ public class Database {
         try (Connection con = dataSource.getConnection()) {
             if (con.isValid(5)) {
 
-                try (Statement statement = con.createStatement()) {
+                String update = "UPDATE card SET balance = balance + ? WHERE number = ?;";
 
-                    statement.executeUpdate("UPDATE card " +
-                            "SET balance = balance + " + amount + " " +
-                            "WHERE number = " + card.getAccountNumber() + ";");
+                try (PreparedStatement preparedStatement = con.prepareStatement(update)) {
+                    preparedStatement.setInt(1, amount);
+                    preparedStatement.setString(2, card.getAccountNumber());
+                    preparedStatement.executeUpdate();
 
                     System.out.println("Income was added!\n");
 
@@ -132,12 +151,12 @@ public class Database {
         try (Connection con = dataSource.getConnection()) {
             if (con.isValid(5)) {
 
-                try (Statement statement = con.createStatement()) {
+                String select = "SELECT number FROM card WHERE number = ?;";
 
-                    try (ResultSet storedCard = statement.executeQuery("SELECT number " +
-                            "FROM card " +
-                            "WHERE " +
-                            "number = '" + accountNumber + "';")) {
+                try (PreparedStatement preparedStatement = con.prepareStatement(select)) {
+                    preparedStatement.setString(1, accountNumber);
+
+                    try (ResultSet storedCard = preparedStatement.executeQuery()) {
 
                         if (storedCard.next()) {
                             return true;
@@ -159,27 +178,41 @@ public class Database {
     }
 
     void doTransfer(CreditCard card, String transferAccountNumber, int transferAmount) {
-
+        boolean source = false;
+        boolean destination = false;
 
         if (getBalance(card) - transferAmount > 0) {
 
             try (Connection con = dataSource.getConnection()) {
                 if (con.isValid(5)) {
 
-                    try (Statement statement = con.createStatement()) {
+                    String updateSource = "UPDATE card SET balance = balance - ? WHERE number = ?;";
+                    String updateDestination = "UPDATE card SET balance = balance + ? WHERE number = ?;";
 
-                        statement.executeUpdate("UPDATE card " +
-                                "SET balance = balance - " + transferAmount + " " +
-                                "WHERE number = " + card.getAccountNumber() + ";");
+                    try (PreparedStatement preparedStatement = con.prepareStatement(updateSource)) {
+                        preparedStatement.setInt(1, transferAmount);
+                        preparedStatement.setString(2, card.getAccountNumber());
+                        preparedStatement.executeUpdate();
 
-                        statement.executeUpdate("UPDATE card " +
-                                "SET balance = balance + " + transferAmount + " " +
-                                "WHERE number = " + transferAccountNumber + ";");
-
-                        System.out.println("Success!\n");
+                        source = true;
 
                     } catch (SQLException e) {
                         e.printStackTrace();
+                    }
+
+                    try (PreparedStatement preparedStatement = con.prepareStatement(updateDestination)) {
+                        preparedStatement.setInt(1, transferAmount);
+                        preparedStatement.setString(2, transferAccountNumber);
+                        preparedStatement.executeUpdate();
+
+                        destination = true;
+
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+
+                    if (source && destination) {
+                        System.out.println("Success!\n");
                     }
 
                 }
@@ -199,10 +232,11 @@ public class Database {
         try (Connection con = dataSource.getConnection()) {
             if (con.isValid(5)) {
 
-                try (Statement statement = con.createStatement()) {
+                String delete = "DELETE FROM card WHERE number = ?;";
 
-                    statement.executeUpdate("DELETE FROM card " +
-                            "WHERE number = " + card.getAccountNumber() + ";");
+                try (PreparedStatement preparedStatement = con.prepareStatement(delete)) {
+                    preparedStatement.setString(1, card.getAccountNumber());
+                    preparedStatement.executeUpdate();
 
                     System.out.println("\nThe account has been closed!\n");
 
